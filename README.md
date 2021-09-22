@@ -11,3 +11,9 @@ Simulation of the behaviour of a crystal lattice in different temperature condit
 <li>Surface diffusion simulation with Transition State Theory
 </ul>
 
+## Files and structure
+<ul>
+<li>fcc100a256.txt: source text file containing perfect crystal lattice position for a 256 atoms fcc-crystal
+<li>functions: folder containing source files
+<li>molecular_dynamics.ipynb: jupyter notebook for code execution
+</ul>
