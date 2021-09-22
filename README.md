@@ -13,7 +13,7 @@ Simulation of the behaviour of a crystal lattice in different temperature condit
 
 ## Files and structure
 <ul>
-<li>fcc100a256.txt: source text file containing perfect crystal lattice position for a 256 atoms fcc-crystal
+<li>fcc100a256.txt: source text file containing perfect crystal lattice position for a 256 atoms fcc-crystal. row 0: lattice dimension; rows 1-257: atoms positions; everything is expressed in nanometers
 <li>functions: folder containing source files
 <li>molecular_dynamics.ipynb: jupyter notebook for code execution
 </ul>
