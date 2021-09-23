@@ -20,7 +20,7 @@ def read_file_pandas(filename):
 
 def find_neighbours_pandas(atoms_position,rc):
     neighbours = []
-    for ix,row in tqdm(enumerate(atoms_position.to_numpy())):
+    for ix,row in enumerate(atoms_position.to_numpy()):
         this_neighbours = []
         for ix2,row2 in enumerate(atoms_position.to_numpy()):
             if (ix != ix2) & (np.sqrt(np.sum((np.abs(row-row2)**2)))<rc):
@@ -66,4 +66,4 @@ def find_neighbours(n_atoms,sx,sy,sz,x,y,z,PBC=False):
     mask1 = distances<rc
     mask2 = distances>0
     mask = mask1 * mask2
-    return coord_x,mask,distances
+    return mask,distances
