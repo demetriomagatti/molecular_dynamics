@@ -49,6 +49,18 @@ def read_file(filename):
     
 
 def find_neighbours(n_atoms,sx,sy,sz,x,y,z,PBC=False):
+    '''
+    returns a boolean mask to tell which atoms can be consideres as "neighbours" wrt to rp and rc values and distances between atoms in the lattice;
+
+    arguments:
+        n_atoms(int): number of atoms in the lattice;
+        sx, sy, sz: lattice span in x,y,z dimension;
+        x, y, z: numpy arrays containing x,y,z coordinates of the atoms
+
+    returns:
+        mask: (n_atoms,n_atoms) ndarray; j-th position in i-th tells if atoms i and j are considered as neighbours
+        distances: (n_atoms,n_atoms) ndarray; j-th position in i-th row contains the distances between atoms i and j
+    '''
     coord_x =  np.column_stack((x,np.zeros(n_atoms),np.zeros(n_atoms)))
     coord_y =  np.column_stack((np.zeros(n_atoms),y,np.zeros(n_atoms)))
     coord_z =  np.column_stack((np.zeros(n_atoms),np.zeros(n_atoms),z))

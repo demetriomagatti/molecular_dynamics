@@ -33,6 +33,9 @@ def lennard_jones_approx(distances):
         true LJ for distance<rp
         poly7 function for rp<distance<rc
         zero interaction for distance>rc
+
+    arguments:
+        distances: (n_atoms,n_atoms) ndarray; j-th position in i-th row contains the distances between atoms i and j
     '''
     mask_rp = distances<rp
     mask_rc = distances<rc
@@ -47,6 +50,9 @@ def lennard_jones_approx(distances):
 def lennard_jones(distances):
     '''
     returns total potential energy value
+
+    arguments:
+        distances: (n_atoms,n_atoms) ndarray; j-th position in i-th row contains the distances between atoms i and j
     '''
     distances[np.where(distances==0)] = np.infty
     Epot = 4*epsilon*((sigma/(distances))**12 - (sigma/(distances))**6)
