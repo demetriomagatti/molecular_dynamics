@@ -25,8 +25,8 @@ Gpoli7 = (1/((rc - rp)**7* rp**15))*4* epsilon* sigma**6* (rp**6* (-224* rc**4 +
 Hpoli7 = (1/((rc - rp)**7* rp**15))*16* epsilon* sigma**6* (rp**6*(14* rc**3 - 63* rc**2* rp + 99* rc* rp**2 - 55* rp**3) + (-91* rc**3 + 351* rc**2* rp - 459* rc* rp**2 + 204* rp**3)* sigma**6)
 
 
-# Total potential energy
-def lennard_jones_approx(distance):
+# Total potential energy (approx)
+def lennard_jones_approx(distances):
     '''
     returns total potential energy value;
     approximation: 
@@ -34,23 +34,20 @@ def lennard_jones_approx(distance):
         poly7 function for rp<distance<rc
         zero interaction for distance>rc
     '''
-    mask_rp = distance<rp
-    mask_rc = distance<rc
-    mask_rc = mask_rc - mask_rp
-    Epot_rp = 4*epsilon*((sigma/(mask_rp*distance))**12 - (sigma/(mask_rp*distance))**6)
-    Epot_rc = Apoli7*mask_rc + Bpoli7*mask_rc*distance + Cpoli7*((mask_rc*distance)**2) + Dpoli7*((mask_rc*distance)**3) + Epoli7*((mask_rc*distance)**4) + Fpoli7*((mask_rc*distance)**5) + Gpoli7*((mask_rc*distance)**6) + Hpoli7*((mask_rc*distance)**7);
+    mask_rp = distances<rp
+    mask_rc = distances<rc
+    mask_rc = mask_rc ^ mask_rp
+    distances[np.where(distances==0)] = np.infty
+    Epot_rp = 4*epsilon*((sigma/(mask_rp*distances))**12 - (sigma/(mask_rp*distances))**6)
+    Epot_rc = Apoli7*mask_rc + Bpoli7*mask_rc*distances + Cpoli7*((mask_rc*distances)**2) + Dpoli7*((mask_rc*distances)**3) + Epoli7*((mask_rc*distances)**4) + Fpoli7*((mask_rc*distances)**5) + Gpoli7*((mask_rc*distances)**6) + Hpoli7*((mask_rc*distances)**7)
     return 0.5*(np.nansum(Epot_rp) + np.nansum(Epot_rc))
 
 
 # Total potential energy
-def lennard_jones(distance):
+def lennard_jones(distances):
     '''
-    returns total potential energy value;
-    approximation: 
-        true LJ for distance<rp
-        poly7 function for rp<distance<rc
-        zero interaction for distance>rc
+    returns total potential energy value
     '''
-    Epot_rp = 4*epsilon*((sigma/(distance))**12 - (sigma/(distance))**6)
-    Epot_rc = Apoli7*+ Bpoli7*distance + Cpoli7*((distance)**2) + Dpoli7*((distance)**3) + Epoli7*((distance)**4) + Fpoli7*((distance)**5) + Gpoli7*((distance)**6) + Hpoli7*((mask_rc*distance)**7)
-    return 0.5*(np.nansum(Epot_rp) + np.nansum(Epot_rc))
+    distances[np.where(distances==0)] = np.infty
+    Epot = 4*epsilon*((sigma/(distances))**12 - (sigma/(distances))**6)
+    return 0.5*np.nansum(Epot)
