@@ -57,3 +57,87 @@ def lennard_jones(distances):
     distances[np.where(distances==0)] = np.infty
     Epot = 4*epsilon*((sigma/(distances))**12 - (sigma/(distances))**6)
     return 0.5*np.nansum(Epot)
+
+
+# Force experienced by each atom (approx)
+def calc_force_approx(n_atoms,sx,sy,sz,x,y,z,distances,PBC=False):
+    '''
+    arguments:
+        n_atoms(int): number of atoms in the lattice;
+        sx, sy, sz: lattice span in x,y,z dimension;
+        x, y, z: numpy arrays containing x,y,z coordinates of the atoms;
+        distances: (n_atoms,n_atoms) ndarray; j-th position in i-th row contains the distances between atoms i and j;
+        PBC: boolean flag to select whether to active Periodic Boundary Conditions or not; default: False
+
+    returns:
+        Fx,Fy,Fz: n_atoms arrays with x,y,z components of the force experienced by each atom. Fx[i],Fy[i],Fz[i] describes the total force felt by i-th atom
+    '''
+    mask_rp = distances<rp
+    mask_rc = distances<rc
+    mask_rc = mask_rc ^ mask_rp
+    coord_x =  np.column_stack((x,np.zeros(n_atoms),np.zeros(n_atoms)))
+    coord_y =  np.column_stack((np.zeros(n_atoms),y,np.zeros(n_atoms)))
+    coord_z =  np.column_stack((np.zeros(n_atoms),np.zeros(n_atoms),z))
+    x_distances = np.sum(coord_x[:,None,:] - coord_x, axis=-1)
+    y_distances = np.sum(coord_y[:,None,:] - coord_y, axis=-1)        
+    z_distances = np.sum(coord_z[:,None,:] - coord_z, axis=-1)
+    if PBC:
+        mask_x_plus = x_distances>(0.5*sx)
+        mask_y_plus = y_distances>(0.5*sy)
+        mask_x_minus = x_distances<(-0.5*sx)
+        mask_y_minus = y_distances<(-0.5*sy)
+        x_distances = x_distances - sx*mask_x_plus + sx*mask_x_minus
+        y_distances = y_distances - sy*mask_y_plus + sy*mask_y_minus
+    distances[np.where(distances==0)] = np.infty
+    Fx_rp = 24*epsilon*( 2*sigma**12*(mask_rp*distances)**(-14) - sigma**6*(mask_rp*distances)**(-8) )*(mask_rp*x_distances)
+    Fx_rc = - 2*(mask_rc*x_distances)*( 0.5*Bpoli7/(mask_rc*distances) + Cpoli7 + 1.5*Dpoli7*(mask_rc*distances) + 2*Epoli7*(mask_rc*distances)**2 + 2.5*Fpoli7*(mask_rc*distances)**3 + 3*Gpoli7*(mask_rc*distances)**4 + 3.5*Hpoli7*(mask_rc*distances)**5)
+    Fx_rp = np.nansum(Fx_rp,axis=1)
+    Fx_rc = np.nansum(Fx_rc,axis=1)
+    Fx = Fx_rp + Fx_rc
+    Fy_rp = 24*epsilon*( 2*sigma**12*(mask_rp*distances)**(-14) - sigma**6*(mask_rp*distances)**(-8) )*(mask_rp*y_distances)
+    Fy_rc = - 2*(mask_rc*y_distances)*( 0.5*Bpoli7/(mask_rc*distances) + Cpoli7 + 1.5*Dpoli7*(mask_rc*distances) + 2*Epoli7*(mask_rc*distances)**2 + 2.5*Fpoli7*(mask_rc*distances)**3 + 3*Gpoli7*(mask_rc*distances)**4 + 3.5*Hpoli7*(mask_rc*distances)**5)
+    Fy_rp = np.nansum(Fy_rp,axis=1)
+    Fy_rc = np.nansum(Fy_rc,axis=1)
+    Fy = Fy_rp + Fy_rc
+    Fz_rp = 24*epsilon*( 2*sigma**12*(mask_rp*distances)**(-14) - sigma**6*(mask_rp*distances)**(-8) )*(mask_rp*z_distances)    
+    Fz_rc = - 2*(mask_rc*z_distances)*( 0.5*Bpoli7/(mask_rc*distances) + Cpoli7 + 1.5*Dpoli7*(mask_rc*distances) + 2*Epoli7*(mask_rc*distances)**2 + 2.5*Fpoli7*(mask_rc*distances)**3 + 3*Gpoli7*(mask_rc*distances)**4 + 3.5*Hpoli7*(mask_rc*distances)**5)  
+    Fz_rp = np.nansum(Fz_rp,axis=1)
+    Fz_rc = np.nansum(Fz_rc,axis=1)
+    Fz = Fz_rp + Fz_rc
+    return Fx,Fy,Fz
+    
+
+# Force experienced by each atom
+def calc_force(n_atoms,sx,sy,sz,x,y,z,distances,PBC=False):
+    '''
+    arguments:
+        n_atoms(int): number of atoms in the lattice;
+        sx, sy, sz: lattice span in x,y,z dimension;
+        x, y, z: numpy arrays containing x,y,z coordinates of the atoms;
+        distances: (n_atoms,n_atoms) ndarray; j-th position in i-th row contains the distances between atoms i and j;
+        PBC: boolean flag to select whether to active Periodic Boundary Conditions or not; default: False
+
+    returns:
+        Fx,Fy,Fz: n_atoms arrays with x,y,z components of the force experienced by each atom. Fx[i],Fy[i],Fz[i] describes the total force felt by i-th atom
+    '''
+    coord_x =  np.column_stack((x,np.zeros(n_atoms),np.zeros(n_atoms)))
+    coord_y =  np.column_stack((np.zeros(n_atoms),y,np.zeros(n_atoms)))
+    coord_z =  np.column_stack((np.zeros(n_atoms),np.zeros(n_atoms),z))
+    x_distances = np.sum(coord_x[:,None,:] - coord_x, axis=-1)
+    y_distances = np.sum(coord_y[:,None,:] - coord_y, axis=-1)        
+    z_distances = np.sum(coord_z[:,None,:] - coord_z, axis=-1)
+    if PBC:
+        mask_x_plus = x_distances>(0.5*sx)
+        mask_y_plus = y_distances>(0.5*sy)
+        mask_x_minus = x_distances<(-0.5*sx)
+        mask_y_minus = y_distances<(-0.5*sy)
+        x_distances = x_distances - sx*mask_x_plus + sx*mask_x_minus
+        y_distances = y_distances - sy*mask_y_plus + sy*mask_y_minus
+    distances[np.where(distances==0)] = np.infty
+    Fx = 24*epsilon*( 2*sigma**12*(distances)**(-14) - sigma**6*(distances)**(-8) )*(x_distances)
+    Fx = np.nansum(Fx,axis=1)
+    Fy = 24*epsilon*( 2*sigma**12*(distances)**(-14) - sigma**6*(distances)**(-8) )*(y_distances)
+    Fy = np.nansum(Fy,axis=1)
+    Fz = 24*epsilon*( 2*sigma**12*(distances)**(-14) - sigma**6*(distances)**(-8) )*(z_distances)    
+    Fz = np.nansum(Fz,axis=1)
+    return Fx,Fy,Fz

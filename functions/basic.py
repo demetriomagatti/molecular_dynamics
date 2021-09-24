@@ -56,6 +56,7 @@ def find_neighbours(n_atoms,sx,sy,sz,x,y,z,PBC=False):
         n_atoms(int): number of atoms in the lattice;
         sx, sy, sz: lattice span in x,y,z dimension;
         x, y, z: numpy arrays containing x,y,z coordinates of the atoms
+        PBC: boolean flag to select whether to active Periodic Boundary Conditions or not; default: False
 
     returns:
         mask: (n_atoms,n_atoms) ndarray; j-th position in i-th tells if atoms i and j are considered as neighbours
