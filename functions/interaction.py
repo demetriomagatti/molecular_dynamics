@@ -71,9 +71,6 @@ def calc_force_approx(n_atoms,sx,sy,sz,x,y,z,distances,PBC=False):
     returns:
         Fx,Fy,Fz: n_atoms arrays with x,y,z components of the force experienced by each atom. Fx[i],Fy[i],Fz[i] describes the total force felt by i-th atom
     '''
-    mask_rp = distances<rp
-    mask_rc = distances<rc
-    mask_rc = mask_rc ^ mask_rp
     coord_x =  np.column_stack((x,np.zeros(n_atoms),np.zeros(n_atoms)))
     coord_y =  np.column_stack((np.zeros(n_atoms),y,np.zeros(n_atoms)))
     coord_z =  np.column_stack((np.zeros(n_atoms),np.zeros(n_atoms),z))
@@ -89,6 +86,9 @@ def calc_force_approx(n_atoms,sx,sy,sz,x,y,z,distances,PBC=False):
         y_distances = y_distances - sy*mask_y_plus + sy*mask_y_minus
         distances = np.sqrt((x_distances**2 + y_distances**2 + z_distances**2))
     distances[np.where(distances==0)] = np.infty
+    mask_rp = distances<rp
+    mask_rc = distances<rc
+    mask_rc = mask_rc ^ mask_rp
     Fx_rp = 24*epsilon*( 2*sigma**12*(mask_rp*distances)**(-14) - sigma**6*(mask_rp*distances)**(-8) )*(mask_rp*x_distances)
     Fx_rc = - 2*(mask_rc*x_distances)*( 0.5*Bpoli7/(mask_rc*distances) + Cpoli7 + 1.5*Dpoli7*(mask_rc*distances) + 2*Epoli7*(mask_rc*distances)**2 + 2.5*Fpoli7*(mask_rc*distances)**3 + 3*Gpoli7*(mask_rc*distances)**4 + 3.5*Hpoli7*(mask_rc*distances)**5)
     Fx_rp = np.nansum(Fx_rp,axis=1)
