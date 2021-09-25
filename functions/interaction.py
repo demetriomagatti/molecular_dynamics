@@ -66,7 +66,6 @@ def calc_force_approx(n_atoms,sx,sy,sz,x,y,z,distances,PBC=False):
         n_atoms(int): number of atoms in the lattice;
         sx, sy, sz: lattice span in x,y,z dimension;
         x, y, z: numpy arrays containing x,y,z coordinates of the atoms;
-        distances: (n_atoms,n_atoms) ndarray; j-th position in i-th row contains the distances between atoms i and j;
         PBC: boolean flag to select whether to active Periodic Boundary Conditions or not; default: False
 
     returns:
@@ -88,6 +87,7 @@ def calc_force_approx(n_atoms,sx,sy,sz,x,y,z,distances,PBC=False):
         mask_y_minus = y_distances<(-0.5*sy)
         x_distances = x_distances - sx*mask_x_plus + sx*mask_x_minus
         y_distances = y_distances - sy*mask_y_plus + sy*mask_y_minus
+        distances = np.sqrt((x_distances**2 + y_distances**2 + z_distances**2))
     distances[np.where(distances==0)] = np.infty
     Fx_rp = 24*epsilon*( 2*sigma**12*(mask_rp*distances)**(-14) - sigma**6*(mask_rp*distances)**(-8) )*(mask_rp*x_distances)
     Fx_rc = - 2*(mask_rc*x_distances)*( 0.5*Bpoli7/(mask_rc*distances) + Cpoli7 + 1.5*Dpoli7*(mask_rc*distances) + 2*Epoli7*(mask_rc*distances)**2 + 2.5*Fpoli7*(mask_rc*distances)**3 + 3*Gpoli7*(mask_rc*distances)**4 + 3.5*Hpoli7*(mask_rc*distances)**5)
@@ -114,7 +114,6 @@ def calc_force(n_atoms,sx,sy,sz,x,y,z,distances,PBC=False):
         n_atoms(int): number of atoms in the lattice;
         sx, sy, sz: lattice span in x,y,z dimension;
         x, y, z: numpy arrays containing x,y,z coordinates of the atoms;
-        distances: (n_atoms,n_atoms) ndarray; j-th position in i-th row contains the distances between atoms i and j;
         PBC: boolean flag to select whether to active Periodic Boundary Conditions or not; default: False
 
     returns:
@@ -133,6 +132,9 @@ def calc_force(n_atoms,sx,sy,sz,x,y,z,distances,PBC=False):
         mask_y_minus = y_distances<(-0.5*sy)
         x_distances = x_distances - sx*mask_x_plus + sx*mask_x_minus
         y_distances = y_distances - sy*mask_y_plus + sy*mask_y_minus
+        x_distances[np.where(np.abs(np.round(x_distances,4))==0.5*sx)] = 0
+        y_distances[np.where(np.abs(np.round(y_distances,4))==0.5*sx)] = 0
+        distances = np.sqrt((x_distances**2 + y_distances**2 + z_distances**2))
     distances[np.where(distances==0)] = np.infty
     Fx = 24*epsilon*( 2*sigma**12*(distances)**(-14) - sigma**6*(distances)**(-8) )*(x_distances)
     Fx = np.nansum(Fx,axis=1)
