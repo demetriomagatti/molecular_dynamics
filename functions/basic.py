@@ -5,7 +5,8 @@ import pandas as pd
 # constant values
 rc = 4.625
 rp = 4.375
-
+kb = 1/11603
+m_ag = 108*1.66e-27/16
 
 '''
 First idea: read file and save results in pandas dataframe. Index = atom index, three columns for x, y, z coordinates.
@@ -80,3 +81,24 @@ def find_neighbours(n_atoms,sx,sy,sz,x,y,z,PBC=False):
     mask2 = distances>0
     mask = mask1 * mask2
     return mask,distances
+
+
+def initialize_speed(n_atoms,x,y,z,T,remove_translation=True):
+    c = np.sqrt(3*kb*T/m_ag)
+    vx = c*(2*np.random.rand(n_atoms))
+    vy = c*(2*np.random.rand(n_atoms))
+    vz = c*(2*np.random.rand(n_atoms))
+    vx[n_atoms-1] = 0
+    vy[n_atoms-1] = 0
+    vz[n_atoms-1] = 0
+    if remove_translation:
+        vx = np.asarray([v - np.mean(vx) for v in vx])
+        vy = np.asarray([v - np.mean(vy) for v in vy])
+        vz = np.asarray([v - np.mean(vz) for v in vz])
+    v2 = vx**2 + vy**2  + vz**2
+    Ekin = 0.5*m_ag*np.sum(v2)
+    Tkin = 2*Ekin/(3*n_atoms*kb)     
+    vx = vx*np.sqrt(T/Tkin)
+    vy = vy*np.sqrt(T/Tkin)
+    vz = vz*np.sqrt(T/Tkin)
+    return vx,vy,vz
