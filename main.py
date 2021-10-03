@@ -11,11 +11,12 @@ def make_simulation(filename,T,timelength,timestep,PBC=False,approx=False):
     '''
     lattice = basic.read_file(filename)
     n_atoms,sx,sy,sz,x,y,z = lattice
+    mask, distance = basic.find_neighbours(*lattice, PBC=PBC)
     vx,vy,vz = basic.initialize_speed(n_atoms,x,y,z,T,remove_translation=True)
     if approx:
-        Fx,Fy,Fz = interaction.calc_force_approx(*lattice,distances,PBC=PBC)
+        Fx,Fy,Fz = interaction.calc_force_approx(*lattice,distance,PBC=PBC)
     else:
-        Fx,Fy,Fz = interaction.calc_force(*lattice,distances,PBC=PBC)
+        Fx,Fy,Fz = interaction.calc_force(*lattice,distance,PBC=PBC)
     ax,ay,az = interaction.calc_acceleration(Fx,Fy,Fz)
     v2 = vx**2 + vy**2  + vz**2
     Ekin = 0.5*m_ag*np.sum(v2)
@@ -39,14 +40,18 @@ def make_simulation(filename,T,timelength,timestep,PBC=False,approx=False):
     for i in tqdm(range(0,steps)):
         new_x,new_y,new_z = evolution.make_a_move(x,y,z,vx,vy,vz,ax,ay,az,timestep)
         lattice = n_atoms,sx,sy,sz,new_x,new_y,new_z
-        mask, distance = basic.find_neighbours(*lattice, PBC=False)
-        new_Fx,new_Fy,new_Fz = interaction.calc_force(n_atoms,sx,sy,sz,new_x,new_y,new_z,distance,PBC=False)
+        mask, distance = basic.find_neighbours(*lattice, PBC=PBC)
+        if approx:
+            new_Fx,new_Fy,new_Fz = interaction.calc_force_approx(n_atoms,sx,sy,sz,new_x,new_y,new_z,distance,PBC=PBC)
+            E_pot = interaction.lennard_jones_approx(distance)
+        else:
+            new_Fx,new_Fy,new_Fz = interaction.calc_force(n_atoms,sx,sy,sz,new_x,new_y,new_z,distance,PBC=PBC)
+            E_pot = interaction.lennard_jones(distance)
         new_ax,new_ay,new_az = interaction.calc_acceleration(new_Fx,new_Fy,new_Fz)
         new_vx,new_vy,new_vz = evolution.update_velocity(vx,vy,vz,ax,ay,az,new_ax,new_ay,new_az,timestep)
         v2 = new_vx**2 + new_vy**2  + new_vz**2
         E_kin = 0.5*m_ag*np.sum(v2)
         T_kin = 2*E_kin/(3*n_atoms*kb)  
-        E_pot = interaction.lennard_jones(distances)
         E_tot = E_kin + E_pot
         ###
         Temp_array.append(T_kin)
