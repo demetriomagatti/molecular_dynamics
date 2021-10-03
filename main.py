@@ -27,7 +27,7 @@ def make_simulation(filename,T,timelength,timestep,PBC=False,approx=False):
     v2 = vx**2 + vy**2  + vz**2
     Ekin = 0.5*m_ag*np.sum(v2)
     Tkin = 2*Ekin/(3*n_atoms*kb)  
-    print('translation removal check:')
+    print('Translation removal check:')
     print(f'    mean vx: {np.mean(vx)}')
     print(f'    mean vy: {np.mean(vy)}')
     print(f'    mean vz: {np.mean(vz)}\n')
@@ -74,4 +74,4 @@ def make_simulation(filename,T,timelength,timestep,PBC=False,approx=False):
     all_x = np.transpose(all_x)
     all_y = np.transpose(all_y)
     all_z = np.transpose(all_z)
-    return all_x,all_y,all_z,Temp_array,energy_array
+    return time_array,all_x,all_y,all_z,Temp_array,energy_array
