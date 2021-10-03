@@ -4,6 +4,12 @@ from functions import interaction
 from functions import evolution
 from tqdm.auto import tqdm
 
+
+# constant values
+kb = 1/11603
+m_ag = 108*1.66e-27/16
+
+
 # Executing a simulation
 def make_simulation(filename,T,timelength,timestep,PBC=False,approx=False):
     '''
@@ -65,7 +71,7 @@ def make_simulation(filename,T,timelength,timestep,PBC=False,approx=False):
         all_z.append(z)
     Temp_array = np.asarray(Temp_array)
     energy_array = np.asarray(energy_array)
-    all_x = np.transponse(all_x)
-    all_y = np.transponse(all_y)
-    all_z = np.transponse(all_z)
+    all_x = np.transpose(all_x)
+    all_y = np.transpose(all_y)
+    all_z = np.transpose(all_z)
     return all_x,all_y,all_z,Temp_array,energy_array
