@@ -1,7 +1,7 @@
 import numpy as np
-import basic 
-import interaction
-import evolution
+from functions import basic 
+from functions import interaction
+from functions import evolution
 from tqdm.auto import tqdm
 
 # Executing a simulation
