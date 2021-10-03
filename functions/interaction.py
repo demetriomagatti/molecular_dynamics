@@ -143,3 +143,18 @@ def calc_force(n_atoms,sx,sy,sz,x,y,z,distances,PBC=False):
     Fz = 24*epsilon*( 2*sigma**12*(distances)**(-14) - sigma**6*(distances)**(-8) )*(z_distances)    
     Fz = np.nansum(Fz,axis=1)
     return Fx,Fy,Fz
+
+
+# From force to acceleration
+def calc_acceleration(Fx,Fy,Fz):
+    '''
+    arguments:
+        Fx,Fy,Fz: n_atoms long arrays; Fx[i],Fy[i],Fz[i] describes the total force felt by i-th atom
+
+    returns:
+        ax,ay,az: n_atoms long arrays; ax[i],ay[i],az[i] describes the total acceleration felt by i-th atom
+    '''
+    ax = Fx/m_ag
+    ay = Fy/m_ag    
+    az = Fz/m_ag
+    return ax,ay,az
