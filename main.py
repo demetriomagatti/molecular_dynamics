@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd 
 from functions import basic 
 from functions import interaction
 from functions import evolution
@@ -75,3 +76,39 @@ def make_simulation(filename,T,timelength,timestep,PBC=False,approx=False):
     all_y = np.transpose(all_y)
     all_z = np.transpose(all_z)
     return time_array,all_x,all_y,all_z,Temp_array,energy_array
+
+
+# cumulative results
+def build_results_df(temperature,lattice,results,dump_time):
+    '''
+    returns dataframe with simulation foremost parameters
+    '''
+    df = pd.DataFrame()
+    dump_index = np.argmin(np.abs(results[0] - dump_time))
+    df['x0'] = lattice[4]
+    df['y0'] = lattice[5]
+    df['z0'] = lattice[6]
+    df['simulation_time'] = results[0][-1]
+    df['rejected_time'] = results[0][dump_index]
+    df['timestep'] = results[0][1]-results[0][0]
+    # temperature and energy
+    df['temperature_goal'] = temperature
+    df['temperature_mean'] = np.mean(results[4][dump_index:])
+    df['temperature_std'] = np.std(results[4][dump_index:])
+    df['energy_mean'] = np.mean(results[5][dump_index:])
+    df['energy_std'] = np.std(results[5][dump_index:])
+    if np.abs(np.std(results[5][dump_index:])/np.mean(results[5][dump_index:]))<1e-5:
+        df['status'] = 'Success'
+    else:
+        df['status'] = 'Fail'
+    # positions
+    all_x = np.transpose(np.transpose(results[1])[dump_index:])
+    all_y = np.transpose(np.transpose(results[2])[dump_index:])
+    all_z = np.transpose(np.transpose(results[3])[dump_index:])
+    df['x_mean'] = np.mean(all_x,axis=1)
+    df['x_std'] = np.std(all_x,axis=1)
+    df['y_mean'] = np.mean(all_y,axis=1)
+    df['y_std'] = np.std(all_y,axis=1)
+    df['z_mean'] = np.mean(all_z,axis=1)
+    df['z_std'] = np.std(all_z,axis=1)
+    return df
