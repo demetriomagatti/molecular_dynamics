@@ -1,0 +1,28 @@
+{
+    "simulation_list":[
+       {
+          "temperature": 100,
+          "timestep": 1.5e-14,
+          "total_time": 20e-12,
+          "rejected_time": 8e-12
+       },
+       {
+          "temperature": 200,
+          "timestep": 1.0e-14,
+          "total_time": 20e-12,
+          "rejected_time": 8e-12
+       },
+       {
+        "temperature": 400,
+        "timestep": 0.5e-14,
+        "total_time": 20e-12,
+        "rejected_time": 8e-12
+        },
+        {
+         "temperature": 800,
+         "timestep": 2.5e-15,
+         "total_time": 20e-12,
+         "rejected_time": 8e-12
+         }
+    ]
+ }
