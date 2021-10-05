@@ -92,7 +92,7 @@ def build_results_df(temperature,lattice,results,dump_time):
     df['rejected_time'] = results[0][dump_index]
     df['timestep'] = results[0][1]-results[0][0]
     # temperature and energy
-    df['temperature_goal'] = temperature
+    df['temperature_goal'] = temperature/2
     df['temperature_mean'] = np.mean(results[4][dump_index:])
     df['temperature_std'] = np.std(results[4][dump_index:])
     df['energy_mean'] = np.mean(results[5][dump_index:])
