@@ -11,7 +11,7 @@ Simulation of the behaviour of a crystal lattice in different temperature condit
 
 ## Files and structure
 <ul>
-<li>fcc100a256.txt: source text file containing perfect crystal lattice position for a 256 atoms fcc-crystal. row 0: lattice dimension; rows 1-257: atoms positions; everything is expressed in nanometers
+<li>fcc100a256.txt: source text file containing perfect crystal lattice position for a 256 atoms fcc-crystal. row 0: lattice dimension; rows 1-257: atoms positions; everything is expressed in angstrom
 <li>functions: folder containing source files
 <li>results: folder with simulation results in .xlsx extension
 <li>config.json: json file to define conditions for different simulations in a row
